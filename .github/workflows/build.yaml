@@ -1,0 +1,98 @@
+name: Build 'n Deploy
+
+on: 
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+    paths-ignore:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'bumpver.toml'
+
+jobs:
+  lint_n_test:
+    name: lint and test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Install package
+        run: npm ci
+      - name: Lint
+        run: npm lint
+      - name: Test
+        run: npm test
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    needs: lint_n_test
+    steps:
+      #   -- Setup --
+      - uses: getsentry/action-github-app-token@v2
+        name: my-app-install token
+        id: podaac-cicd
+        with:
+          app_id: ${{ secrets.CICD_APP_ID }}
+          private_key: ${{ secrets.CICD_APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository }}
+          token: ${{ steps.podaac-cicd.outputs.token }}
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Setup git user
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      #   -- Version Bumping --
+      - name: Bump alpha version
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          TAG=$(bumpver show -e | awk -F= '$1 == "TAG" {print $2};')
+          if [ $TAG == 'final' ]; then
+            # Bump patch version first then append tag
+            bumpver update --patch --tag alpha --tag-num
+          else
+            bumpver update --tag alpha --tag-num
+          fi
+      - name: Bump rc version
+        if: startsWith(github.ref, 'refs/heads/release/')
+        run: bumpver update --patch --tag rc --tag-num
+      - name: Release version
+        if: github.ref == 'refs/heads/main'
+        run: bumpver update --patch --tag final
+
+      #   -- Build --
+      - name: Build lambda package
+        run: npm run build
+      - name: Upload packaged zip
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: dist
+          path: dist/*.zip
+
+      #   -- Terraform Deployment --
+      - name: Deploy to SIT
+        if: github.ref == 'refs/heads/develop'
+        working-directory: terraform/
+        env:
+          AWS_ACCESS_KEY_ID:       ${{ secrets.AWS_ACCESS_KEY_ID_SERVICES_SIT }}
+          AWS_SECRET_ACCESS_KEY:   ${{ secrets.AWS_SECRET_ACCESS_KEY_SERVICES_SIT }}
+          AWS_DEFAULT_REGION:      us-west-2
+        run: |
+          source bin/config.sh sit
+          terraform apply -auto-approve
