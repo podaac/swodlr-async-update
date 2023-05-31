@@ -11,12 +11,14 @@ on:
       - 'package-lock.json'
       - 'bumpver.toml'
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   lint_n_test:
     name: lint and test
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -26,6 +28,8 @@ jobs:
       - uses: hashicorp/setup-terraform@v2.0.3
       - name: Install package
         run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Lint
         run: npm lint
       - name: Test
@@ -83,6 +87,8 @@ jobs:
       #   -- Build --
       - name: Build lambda package
         run: npm run build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload packaged zip
         uses: actions/upload-artifact@v3.1.0
         with:
