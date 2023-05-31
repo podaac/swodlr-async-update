@@ -1,14 +1,14 @@
 #!/bin/bash
 
-rm -rf build
-mkdir build
+rm -rf build/*
+mkdir -p build
 
 cp -r lib schemas build
 cp package.json package-lock.json build
-npm ci --omit dev --prefix build --quiet
+npm ci --omit dev --prefix build --quiet --ignore-scripts true
 
-rm -rf dist
-mkdir dist
 
+mkdir -p dist
 PACKAGE_NAME=$(npm pkg get name version | jq -r ".name + \"-\" + .version")
-zip -r "dist/$PACKAGE_NAME.zip" build/*
+cd build
+zip -r "../dist/$PACKAGE_NAME.zip" .
