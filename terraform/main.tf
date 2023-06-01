@@ -37,6 +37,7 @@ locals {
   environment = var.stage
 
   app_prefix      = "service-${var.app_name}-${local.environment}"
+  app_path        = "/service/${var.app_name}"
   service_prefix  = "service-${var.app_name}-${local.environment}-${var.service_name}"
   service_path    = "/service/${var.app_name}/${var.service_name}"
 

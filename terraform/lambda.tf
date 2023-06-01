@@ -69,3 +69,28 @@ resource "aws_iam_role" "lambda" {
     })
   }
 }
+
+# -- SSM Parameters --
+resource "aws_ssm_parameter" "db_host" {
+  name = "${local.service_path}/db_host"
+  type = "String"
+  value = data.aws_db_instance.database.address
+}
+
+resource "aws_ssm_parameter" "db_name" {
+  name = "${local.service_path}/db_name"
+  type = "String"
+  value = data.aws_ssm_parameter.db_name.value
+}
+
+resource "aws_ssm_parameter" "db_username" {
+  name = "${local.service_path}/db_username"
+  type = "String"
+  value = data.aws_ssm_parameter.db_app_username.value
+}
+
+resource "aws_ssm_parameter" "db_password" {
+  name = "${local.service_path}/db_password"
+  type = "SecureString"
+  value = data.aws_ssm_parameter.db_app_password.value
+}
