@@ -1,12 +1,17 @@
 resource "aws_lambda_function" "main" {
   function_name = "${local.service_prefix}-main"
-  handler = "lib.lambdaHandler"
+  handler = "lib/index.lambdaHandler"
 
   role = aws_iam_role.lambda.arn
   runtime = "nodejs18.x"
 
   filename = "${path.module}/../dist/${local.name}-${local.version}.zip"
   source_code_hash = filebase64sha256("${path.module}/../dist/${local.name}-${local.version}.zip")
+
+  vpc_config {
+    security_group_ids = [data.aws_security_group.database.id]
+    subnet_ids = [for k, v in data.aws_subnet.private : v.id]
+  }
 }
 
 # -- IAM --
@@ -36,6 +41,7 @@ resource "aws_iam_role" "lambda" {
   permissions_boundary = "arn:aws:iam::${local.account_id}:policy/NGAPShRoleBoundary"
   managed_policy_arns = [
     "arn:aws:iam::${local.account_id}:policy/NGAPProtAppInstanceMinimalPolicy",
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
     aws_iam_policy.ssm_parameters_read.arn
   ]
 
@@ -93,4 +99,10 @@ resource "aws_ssm_parameter" "db_password" {
   name = "${local.service_path}/db_password"
   type = "SecureString"
   value = data.aws_ssm_parameter.db_app_password.value
+}
+
+resource "aws_ssm_parameter" "log_level" {
+  name = "${local.service_path}/log_level"
+  type = "String"
+  value = var.log_level
 }
