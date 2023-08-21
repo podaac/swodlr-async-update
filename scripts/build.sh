@@ -1,8 +1,8 @@
 #!/bin/bash
 
-rm -rf build/*
-mkdir -p build
+rm -rf build/* dist/*
 
+mkdir -p build
 cp -r lib schemas build
 cp package.json package-lock.json build
 npm ci --omit dev --prefix build --quiet --ignore-scripts true
