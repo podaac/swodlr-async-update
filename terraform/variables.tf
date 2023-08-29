@@ -4,7 +4,7 @@ variable "app_name" {
 }
 
 variable "service_name" {
-    default = "raster-create"
+    default = "async-update"
     type = string
 }
 
