@@ -38,14 +38,12 @@ test('submit a failed job', async () => {
 
   expect(Sequelize.prototype.transaction).toHaveBeenCalledTimes(1);
   expect(Status.create).toHaveBeenCalledTimes(1);
-  expect(Status.prototype.setL2RasterProduct).toHaveBeenCalledTimes(1);
 
   expect(Status.create.mock.calls[0][0]).toMatchObject({
+    productId: '9834b3aa-d3d1-49fa-b8ec-a4482e80c8be',
     state: 'ERROR',
     reason: 'SDS job failed - please contact support',
   });
-  expect(Status.prototype.setL2RasterProduct.mock.calls[0][0].id)
-      .toEqual('9834b3aa-d3d1-49fa-b8ec-a4482e80c8be');
 });
 
 test('submit a successful evaluate job', async () => {
@@ -53,14 +51,12 @@ test('submit a successful evaluate job', async () => {
 
   expect(Sequelize.prototype.transaction).toHaveBeenCalledTimes(1);
   expect(Status.create).toHaveBeenCalledTimes(1);
-  expect(Status.prototype.setL2RasterProduct).toHaveBeenCalledTimes(1);
 
   expect(Status.create.mock.calls[0][0]).toMatchObject({
+    productId: 'a38e973a-cc85-4389-a680-b1d84287322d',
     state: 'GENERATING',
     reason: undefined,
   });
-  expect(Status.prototype.setL2RasterProduct.mock.calls[0][0].id)
-      .toEqual('a38e973a-cc85-4389-a680-b1d84287322d');
 });
 
 test('submit a successful raster job', async () => {
@@ -68,14 +64,12 @@ test('submit a successful raster job', async () => {
 
   expect(Sequelize.prototype.transaction).toHaveBeenCalledTimes(1);
   expect(Status.create).toHaveBeenCalledTimes(1);
-  expect(Status.prototype.setL2RasterProduct).toHaveBeenCalledTimes(1);
 
   expect(Status.create.mock.calls[0][0]).toMatchObject({
+    productId: 'af541198-e12d-4410-9b20-767b13550042',
     state: 'READY',
     reason: undefined,
   });
-  expect(Status.prototype.setL2RasterProduct.mock.calls[0][0].id)
-      .toEqual('af541198-e12d-4410-9b20-767b13550042');
 });
 
 test('submit a waiting job', async () => {
