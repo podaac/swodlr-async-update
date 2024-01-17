@@ -77,7 +77,11 @@ jobs:
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-
+      - name: No version bump
+        # If triggered by workflow dispatch, no version bump
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          echo "TARGET_ENV=${{ github.event.inputs.venue }}" >> $GITHUB_ENV
       #   -- Version Bumping --
       - name: Bump alpha version
         if: github.ref == 'refs/heads/develop'
@@ -141,9 +145,6 @@ jobs:
       startsWith(github.ref, 'refs/heads/release') ||
       github.event_name == 'workflow_dispatch'
     steps:
-      - name: Debug
-        run: |
-          echo "Deploy environment is ${{ steps.npm-build.outputs.deploy_env }}"
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
