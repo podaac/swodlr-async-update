@@ -105,6 +105,7 @@ jobs:
         run: |
           npm run build
           echo "deploy_env=${{ env.TARGET_ENV }}" >> $GITHUB_OUTPUT
+          echo "Setting deploy env to ${{ env.TARGET_ENV }}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload packaged zip
