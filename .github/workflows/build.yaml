@@ -54,6 +54,9 @@ jobs:
       deploy_env: ${{ steps.npm-build.outputs.deploy_env }}
     needs: lint_n_test
     steps:
+      - name: Debug
+        run: |
+          echo "Deploy environment is ${{ steps.npm-build.outputs.deploy_env }}"
       #   -- Setup --
       - uses: getsentry/action-github-app-token@v2
         name: my-app-install token
