@@ -11,6 +11,16 @@ on:
       - 'package-lock.json'
       - 'bumpver.toml'
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      venue:
+        type: choice
+        description: Venue to deploy to
+        options:
+          - SIT
+          - UAT
+
 permissions:
   contents: read
   packages: read
