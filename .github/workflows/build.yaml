@@ -50,6 +50,8 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-latest
+    outputs:
+      deploy_env: ${{ steps.gradle-build.outputs.deploy_env }}
     needs: lint_n_test
     steps:
       #   -- Setup --
@@ -87,16 +89,22 @@ jobs:
           else
             bumpver update --tag alpha --tag-num
           fi
+          echo "TARGET_ENV=SIT" >> $GITHUB_ENV
       - name: Bump rc version
         if: startsWith(github.ref, 'refs/heads/release/')
-        run: bumpver update --patch --tag rc --tag-num
+        run: |
+          bumpver update --patch --tag rc --tag-num
+          echo "TARGET_ENV=UAT" >> $GITHUB_ENV
       - name: Release version
         if: github.ref == 'refs/heads/main'
         run: bumpver update --patch --tag final
 
       #   -- Build --
       - name: Build lambda package
-        run: npm run build
+        id: npm-build
+        run: |
+          npm run build
+          echo "deploy_env=${{ env.TARGET_ENV }}" >> $GITHUB_OUTPUT
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload packaged zip
@@ -115,4 +123,49 @@ jobs:
           AWS_DEFAULT_REGION:      us-west-2
         run: |
           source bin/config.sh sit
+          terraform apply -auto-approve
+
+
+  deploy:
+    name: Deploy
+    needs: build
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ needs.build.outputs.deploy_env }}
+      url: https://swodlr.podaac.${{ needs.build.outputs.deploy_env }}.earthdatacloud.nasa.gov/api/about
+    if: |
+      github.ref == 'refs/heads/develop' ||
+      github.ref == 'refs/heads/main'    ||
+      startsWith(github.ref, 'refs/heads/release') ||
+      github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-west-2
+          role-session-name: GitHubActions
+          aws-access-key-id: ${{ secrets[vars.AWS_ACCESS_KEY_ID_SECRET_NAME] }}
+          aws-secret-access-key: ${{ secrets[vars.AWS_SECRET_ACCESS_KEY_SECRET_NAME] }}
+          mask-aws-account-id: true
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository }}
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+      - name: Deploy to venue
+        id: terraform-deploy
+        working-directory: terraform/
+        env:
+          AWS_DEFAULT_REGION: us-west-2
+          # TF_VAR_edl_base_url: ${{ secrets.EDL_BASE_URL }}
+          # TF_VAR_edl_client_id: ${{ secrets.EDL_CLIENT_IT }}
+          # TF_VAR_edl_client_secret: ${{ secrets.EDL_CLIENT_SECRET }}
+          # TF_VAR_session_encryption_key: ${{ secrets.SESSION_ENCRYPTION_KEY }}
+          # TF_VAR_ingest_aws_account: ${{ secrets.INGEST_AWS_ACCOUNT }}
+          # TF_VAR_ingest_aws_role: ${{ secrets.INGEST_AWS_ROLE }}
+        run: |
+          source bin/config.sh ${{ vars.TF_VENUE }}
           terraform apply -auto-approve
