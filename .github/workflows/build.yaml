@@ -51,7 +51,7 @@ jobs:
     name: build
     runs-on: ubuntu-latest
     outputs:
-      deploy_env: ${{ steps.gradle-build.outputs.deploy_env }}
+      deploy_env: ${{ steps.npm-build.outputs.deploy_env }}
     needs: lint_n_test
     steps:
       #   -- Setup --
