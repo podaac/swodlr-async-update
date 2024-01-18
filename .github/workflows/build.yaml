@@ -175,6 +175,7 @@ jobs:
           TF_VAR_ingest_aws_account: ${{ secrets.INGEST_AWS_ACCOUNT }}
           TF_VAR_ingest_aws_role: ${{ secrets.INGEST_AWS_ROLE }}
         run: |
+          pwd
           ls -al
           ls -al ../
           source bin/config.sh ${{ vars.TF_VENUE }}
