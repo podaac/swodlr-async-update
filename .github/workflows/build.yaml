@@ -124,7 +124,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: ${{ needs.build.outputs.deploy_env }}
-      url: https://swodlr.podaac.${{ needs.build.outputs.deploy_env }}.earthdatacloud.nasa.gov/api/about
     if: |
       github.ref == 'refs/heads/develop' ||
       github.ref == 'refs/heads/main'    ||
