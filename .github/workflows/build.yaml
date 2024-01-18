@@ -164,7 +164,7 @@ jobs:
         id: terraform-deploy
         working-directory: terraform/
         env:
-          ARTIFACT_URL: ${{ jobs.build.steps.artifact-upload.outputs.artifact-url }}
+          ARTIFACT_URL: ${{ needs.build.steps.artifact-upload.outputs.artifact-url }}
           AWS_DEFAULT_REGION: us-west-2
           TF_VAR_edl_base_url: ${{ secrets.EDL_BASE_URL }}
           TF_VAR_edl_client_id: ${{ secrets.EDL_CLIENT_ID }}
