@@ -163,7 +163,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: dist
-          path: terraform/dist/
+          path: dist/
       - name: Deploy to venue
         id: terraform-deploy
         working-directory: terraform/
