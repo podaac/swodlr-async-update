@@ -52,7 +52,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       deploy_env: ${{ steps.npm-build.outputs.deploy_env }}
-      artifact_url: ${{ steps.artifact-upload.outputs.artifact-url }}
     needs: lint_n_test
     steps:
       #   -- Setup --
@@ -113,15 +112,10 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload packaged zip
-        id: artifact-upload
         uses: actions/upload-artifact@v3.1.0
         with:
           name: dist
           path: dist/*.zip
-
-      - name: debug show artifact url
-        run: |
-          echo "Artifact URL: ${{steps.artifact-upload.outputs.artifact-url}}"
 
       # #   -- Terraform Deployment --
       # - name: Deploy to SIT
@@ -165,11 +159,14 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
+      - name: Retrieve artifact from build step
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
       - name: Deploy to venue
         id: terraform-deploy
         working-directory: terraform/
         env:
-          ARTIFACT_URL: ${{ needs.build.outputs.artifact_url }}
           AWS_DEFAULT_REGION: us-west-2
           TF_VAR_edl_base_url: ${{ secrets.EDL_BASE_URL }}
           TF_VAR_edl_client_id: ${{ secrets.EDL_CLIENT_ID }}
@@ -178,7 +175,6 @@ jobs:
           TF_VAR_ingest_aws_account: ${{ secrets.INGEST_AWS_ACCOUNT }}
           TF_VAR_ingest_aws_role: ${{ secrets.INGEST_AWS_ROLE }}
         run: |
-          echo "Artifact URL ${{ env.ARTIFACT_URL }}"
           ls -al
           ls -al ../
           source bin/config.sh ${{ vars.TF_VENUE }}
