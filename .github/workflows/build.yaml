@@ -52,6 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       deploy_env: ${{ steps.npm-build.outputs.deploy_env }}
+      artifact_url: ${{ steps.artifact-upload.outputs.artifact-url }}
     needs: lint_n_test
     steps:
       #   -- Setup --
@@ -164,7 +165,7 @@ jobs:
         id: terraform-deploy
         working-directory: terraform/
         env:
-          ARTIFACT_URL: ${{ needs.build.steps.artifact-upload.outputs.artifact-url }}
+          ARTIFACT_URL: ${{ needs.build.outputs.artifact-url }}
           AWS_DEFAULT_REGION: us-west-2
           TF_VAR_edl_base_url: ${{ secrets.EDL_BASE_URL }}
           TF_VAR_edl_client_id: ${{ secrets.EDL_CLIENT_ID }}
