@@ -112,6 +112,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload packaged zip
+        id: artifact-upload
         uses: actions/upload-artifact@v3.1.0
         with:
           name: dist
@@ -163,6 +164,7 @@ jobs:
         id: terraform-deploy
         working-directory: terraform/
         env:
+          ARTIFACT_URL: ${{ jobs.build.steps.artifact-upload.outputs.artifact-url }}
           AWS_DEFAULT_REGION: us-west-2
           TF_VAR_edl_base_url: ${{ secrets.EDL_BASE_URL }}
           TF_VAR_edl_client_id: ${{ secrets.EDL_CLIENT_ID }}
@@ -171,6 +173,7 @@ jobs:
           TF_VAR_ingest_aws_account: ${{ secrets.INGEST_AWS_ACCOUNT }}
           TF_VAR_ingest_aws_role: ${{ secrets.INGEST_AWS_ROLE }}
         run: |
+          echo "Artifact URL ${{ env.ARTIFACT_URL }}"
           ls -al
           ls -al ../
           source bin/config.sh ${{ vars.TF_VENUE }}
