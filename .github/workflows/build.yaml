@@ -119,6 +119,10 @@ jobs:
           name: dist
           path: dist/*.zip
 
+      - name: debug show artifact
+        run: |
+          echo "Artifact URL: ${{ build.outputs.artifact_url }}"
+
       # #   -- Terraform Deployment --
       # - name: Deploy to SIT
       #   if: github.ref == 'refs/heads/develop'
@@ -165,7 +169,7 @@ jobs:
         id: terraform-deploy
         working-directory: terraform/
         env:
-          ARTIFACT_URL: ${{ needs.build.outputs.artifact-url }}
+          ARTIFACT_URL: ${{ needs.build.outputs.artifact_url }}
           AWS_DEFAULT_REGION: us-west-2
           TF_VAR_edl_base_url: ${{ secrets.EDL_BASE_URL }}
           TF_VAR_edl_client_id: ${{ secrets.EDL_CLIENT_ID }}
