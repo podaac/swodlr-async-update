@@ -172,5 +172,6 @@ jobs:
           TF_VAR_ingest_aws_role: ${{ secrets.INGEST_AWS_ROLE }}
         run: |
           ls -al
+          ls -al ../
           source bin/config.sh ${{ vars.TF_VENUE }}
           terraform apply -auto-approve
