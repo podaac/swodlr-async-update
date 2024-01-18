@@ -119,6 +119,10 @@ jobs:
           name: dist
           path: dist/*.zip
 
+      - name: debug show artifact url
+        run: |
+          echo "Artifact URL: ${{steps.artifact-upload.outputs.artifact-url}}"
+
       # #   -- Terraform Deployment --
       # - name: Deploy to SIT
       #   if: github.ref == 'refs/heads/develop'
