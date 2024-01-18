@@ -109,7 +109,6 @@ jobs:
         run: |
           npm run build
           echo "deploy_env=${{ env.TARGET_ENV }}" >> $GITHUB_OUTPUT
-          echo "Setting deploy env to ${{ env.TARGET_ENV }}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload packaged zip
@@ -118,17 +117,17 @@ jobs:
           name: dist
           path: dist/*.zip
 
-      #   -- Terraform Deployment --
-      - name: Deploy to SIT
-        if: github.ref == 'refs/heads/develop'
-        working-directory: terraform/
-        env:
-          AWS_ACCESS_KEY_ID:       ${{ secrets.AWS_ACCESS_KEY_ID_SERVICES_SIT }}
-          AWS_SECRET_ACCESS_KEY:   ${{ secrets.AWS_SECRET_ACCESS_KEY_SERVICES_SIT }}
-          AWS_DEFAULT_REGION:      us-west-2
-        run: |
-          source bin/config.sh sit
-          terraform apply -auto-approve
+      # #   -- Terraform Deployment --
+      # - name: Deploy to SIT
+      #   if: github.ref == 'refs/heads/develop'
+      #   working-directory: terraform/
+      #   env:
+      #     AWS_ACCESS_KEY_ID:       ${{ secrets.AWS_ACCESS_KEY_ID_SERVICES_SIT }}
+      #     AWS_SECRET_ACCESS_KEY:   ${{ secrets.AWS_SECRET_ACCESS_KEY_SERVICES_SIT }}
+      #     AWS_DEFAULT_REGION:      us-west-2
+      #   run: |
+      #     source bin/config.sh sit
+      #     terraform apply -auto-approve
 
 
   deploy:
@@ -172,5 +171,6 @@ jobs:
           TF_VAR_ingest_aws_account: ${{ secrets.INGEST_AWS_ACCOUNT }}
           TF_VAR_ingest_aws_role: ${{ secrets.INGEST_AWS_ROLE }}
         run: |
+          ls -al
           source bin/config.sh ${{ vars.TF_VENUE }}
           terraform apply -auto-approve
