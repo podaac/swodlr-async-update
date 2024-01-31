@@ -20,7 +20,6 @@ on:
         options:
           - SIT
           - UAT
-          - OPS
 
 permissions:
   contents: read
@@ -31,7 +30,7 @@ jobs:
     name: lint and test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -63,9 +62,8 @@ jobs:
         with:
           app_id: ${{ secrets.CICD_APP_ID }}
           private_key: ${{ secrets.CICD_APP_PRIVATE_KEY }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          repository: ${{ github.repository }}
           token: ${{ steps.podaac-cicd.outputs.token }}
       - uses: actions/setup-python@v4
         with:
@@ -150,9 +148,8 @@ jobs:
           aws-access-key-id: ${{ secrets[vars.AWS_ACCESS_KEY_ID_SECRET_NAME] }}
           aws-secret-access-key: ${{ secrets[vars.AWS_SECRET_ACCESS_KEY_SECRET_NAME] }}
           mask-aws-account-id: true
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          repository: ${{ github.repository }}
           ref: ${{ needs.build.outputs.github_sha }}
       - uses: hashicorp/setup-terraform@v2
         with:
