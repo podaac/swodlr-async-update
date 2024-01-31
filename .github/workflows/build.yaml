@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
           registry-url: 'https://npm.pkg.github.com'
@@ -70,7 +70,7 @@ jobs:
           python-version: '3.9'
       - name: Install bumpver & poetry
         run: pip3 install bumpver poetry poetry-plugin-bundle
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
           registry-url: 'https://npm.pkg.github.com'
