@@ -51,7 +51,7 @@ jobs:
     name: build
     runs-on: ubuntu-latest
     outputs:
-      deploy_env: ${{ steps.npm-build.outputs.deploy_env }}
+      deploy_env: ${{ steps.set-env.outputs.deploy_env }}
       github_sha: ${{ steps.update-sha.outputs.github_sha }}
     needs: lint_n_test
     steps:
@@ -109,10 +109,8 @@ jobs:
         id: set-env
         run: |
           echo "deploy_env=${{ env.TARGET_ENV }}" >> $GITHUB_OUTPUT
-
       #   -- Build --
       - name: Build lambda package
-        id: npm-build
         run: |
           npm run build
         env:
