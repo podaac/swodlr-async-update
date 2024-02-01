@@ -4,6 +4,7 @@ version_pattern = "MAJOR.MINOR.PATCH[-TAGNUM]"
 commit = true
 tag = true
 push = true
+pre_commit_hook = "scripts/npm-version.sh"
 
 [bumpver.file_patterns]
 "bumpver.toml" = [
