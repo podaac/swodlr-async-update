@@ -1,6 +1,6 @@
 {
   "name": "swodlr-async-update",
-  "version": "0.0.2-alpha11",
+  "version": "0.0.2-alpha12",
   "description": "Asynchronous database update microservice",
   "main": "lib/index.js",
   "type": "module",
