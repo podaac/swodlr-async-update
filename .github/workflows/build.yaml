@@ -20,6 +20,9 @@ on:
         options:
           - SIT
           - UAT
+      commit:
+        type: string
+        description: Custom commit hash
 
 permissions:
   contents: read
@@ -30,7 +33,14 @@ jobs:
     name: lint and test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Initial checkout ${{ github.ref }}
+        if: github.event.inputs.commit == ''
+        uses: actions/checkout@v4
+      - name: Adjust to proper commit hash ${{ github.event.inputs.commit }}
+        if: github.event.inputs.commit != ''
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.commit }}
       - uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -62,8 +72,16 @@ jobs:
         with:
           app_id: ${{ secrets.CICD_APP_ID }}
           private_key: ${{ secrets.CICD_APP_PRIVATE_KEY }}
-      - uses: actions/checkout@v4
+      - name: Initial checkout ${{ github.ref }}
+        if: github.event.inputs.commit == ''
+        uses: actions/checkout@v4
         with:
+          token: ${{ steps.podaac-cicd.outputs.token }}
+      - name: Adjust to proper commit hash ${{ github.event.inputs.commit }}
+        if: github.event.inputs.commit != ''
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.commit }}
           token: ${{ steps.podaac-cicd.outputs.token }}
       - uses: actions/setup-python@v4
         with:
@@ -174,3 +192,16 @@ jobs:
           VENUE=$(echo "${{ vars.TF_VENUE }}" | tr '[:upper:]' '[:lower:]')
           source bin/config.sh $VENUE
           terraform apply -auto-approve
+      - name: Retrieve version number for notifications
+        run: |
+          VERSION=$(cat bumpver.toml|grep current_version |grep -v {version} |sed -E "s/current_version = //"|sed -E "s/\"//g")
+          echo "SUBMODULE_VERSION=$VERSION">>$GITHUB_ENV
+      - name: Send notifications to slack
+        uses: slackapi/slack-github-action@v1.25.0
+        env:
+          SLACK_WEBHOOK_URL: https://hooks.slack.com/triggers/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
+        with:
+          payload: |
+            {
+              "message": "${{ github.repository }} [version ${{ env.SUBMODULE_VERSION }}] has been deployed to the ${{ needs.build.outputs.deploy_env }} environment"
+            }
