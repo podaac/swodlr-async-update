@@ -1,0 +1,37 @@
+{
+  "name": "swodlr-async-update",
+  "version": "0.0.2-alpha12",
+  "description": "Asynchronous database update microservice",
+  "main": "lib/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "build": "./scripts/build.sh",
+    "lint": "eslint lib test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/podaac/swodlr-async-update.git"
+  },
+  "author": "podaac-tva <podaac-tva@jpl.nasa.gov>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/podaac/swodlr-async-update/issues"
+  },
+  "homepage": "https://github.com/podaac/swodlr-async-update#readme",
+  "dependencies": {
+    "@aws-sdk/client-ssm": "^3.316.0",
+    "@podaac/swodlr-db-models": "^0.0.5",
+    "@types/node": "^20.2.3",
+    "ajv": "^8.12.0",
+    "got": "^13.0.0",
+    "pg": "^8.11.0",
+    "sequelize": "^6.31.1",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.41.0",
+    "eslint-config-google": "^0.14.0",
+    "jest": "^29.5.0"
+  }
+}

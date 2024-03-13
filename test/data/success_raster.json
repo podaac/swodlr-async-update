@@ -1,0 +1,15 @@
+{
+  "Records": [
+    {
+      "messageId": "MessageID_1",
+      "receiptHandle": "ReceiptHandle_1",
+      "body": "{\"product_id\":\"af541198-e12d-4410-9b20-767b13550042\",\"job_status\":\"job-completed\",\"job_id\":\"3120c356-a00f-4078-9ad1-c7e24cd6853a\",\"stage\":\"submit_raster\"}",
+      "attributes": {},
+      "messageAttributes": {},
+      "md5OfBody": "",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:us-east-2:123456789012:queue",
+      "awsRegion": "us-west-2"
+    }
+  ]
+}

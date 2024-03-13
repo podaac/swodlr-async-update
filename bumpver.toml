@@ -1,0 +1,12 @@
+[bumpver]
+current_version = "0.0.2-alpha12"
+version_pattern = "MAJOR.MINOR.PATCH[-TAGNUM]"
+commit = true
+tag = true
+push = true
+pre_commit_hook = "scripts/npm-version.sh"
+
+[bumpver.file_patterns]
+"bumpver.toml" = [
+    'current_version = "{version}"',
+]
