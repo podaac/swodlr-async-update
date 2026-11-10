@@ -59,4 +59,7 @@ jobs:
         run: |
           VENUE=$(echo "${{ vars.TF_VENUE }}" | tr '[:upper:]' '[:lower:]')
           source bin/config.sh $VENUE
-          terraform destroy -auto-approve
+          # -refresh=false: this stack looks up resources owned by swodlr-api
+          # (RDS, SSM, SQS). If those are already gone, refreshing fails, so
+          # destroy from the state recorded at the last deploy instead.
+          terraform destroy -auto-approve -refresh=false
